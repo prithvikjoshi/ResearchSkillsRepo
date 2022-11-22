@@ -1,21 +1,6 @@
 from pandas import *
 import numpy as np
 
-
-def f(fkth, fath, ftint, ftext, fksun, fisun, fqp, fqel):
-    """Function to calculate the hourly heating demands of a building on EPFL Campus"""
-    # fkth = value of building envelope thermal coefficient (kW/sq.m.-K)
-    # fath = value of building envelope area (sq. m.)
-    # ftint = internal temperature of building, set at 21˚C
-    # ftext = external temperature in a given hour
-    # fksun = solar heat gain coefficient of the building
-    # fisun = solar irradiation in an hour (W/sq.m.)
-    # fqp = heat gains due to people in the given hour
-    # fqel = heat gains due to electrical appliances in the given hour
-    q_hour = fath * (((fkth / 1000) * (ftint - ftext)) - (fksun * (fisun / 1000)) - (fqp / 1000)) - (fel * fqel)
-    return q_hour
-
-
 # ------------------------------------initializing given parameters and data--------------------------------------------
 
 # fel set at 80% by default from literature

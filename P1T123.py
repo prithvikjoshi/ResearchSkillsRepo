@@ -5,35 +5,29 @@ import numpy as np
 from pandas import *
 
 
-def g(fkth, fath, ftint, ftext, fksun, fisun, fqp, fqel):
-    """
-    equation for the estimation of internal heat gains
-    :param fkth: k_th
-    :param fath: heated area
-    :param ftint: set internal temperature
-    :param ftext: given external temperature
-    :param fksun: k_sun
-    :param fisun: irradiance
-    :param fqp: heat gains due to people
-    :param fqel: heat gains due to electric devices
-    :return: q_hour, the hourly internal heat gains
-    """
-    q_hour = (fath * (((fkth / 1000) * (ftint - ftext)) - (fksun * (fisun / 1000)) - (fqp / 1000))) - (fel * fqel)
+def calc_qhour(fkth, fath, ftint, ftext, fksun, fisun, fqp, fqel):
+    """Function to calculate the hourly heating demands of a building on EPFL Campus"""
+    # fkth = value of building envelope thermal coefficient (kW/sq.m.-K)
+    # fath = value of building envelope area (sq. m.)
+    # ftint = internal temperature of building, set at 21˚C
+    # ftext = external temperature in a given hour
+    # fksun = solar heat gain coefficient of the building
+    # fisun = solar irradiance in an hour (W/sq.m.)
+    # fqp = heat gains due to people in the given hour
+    # fqel = heat gains due to electrical appliances in the given hour
+    q_hour = fath * (((fkth / 1000) * (ftint - ftext)) - (fksun * (fisun / 1000)) - (fqp / 1000)) - (fel * fqel)
     return q_hour
 
 
-def h(fkth, fath, ftint, ftextavg, fisunavg, fqpavg, fqelavg):
-    """
-    equation for the calculation for the average k_sun values based on mean values of external conditions
-    :param fkth: k_th
-    :param fath: heated area
-    :param ftint: set internal temperature
-    :param ftextavg: mean external temperature
-    :param fisunavg: mean solar irradiance
-    :param fqpavg: mean heat gains due to people
-    :param fqelavg: mean heat gains due to electric devices
-    :return: average f_sun values
-    """
+def calc_ksunavg(fkth, fath, ftint, ftextavg, fisunavg, fqpavg, fqelavg):
+    """Function to calculate average ksun values based on mean values of external conditions in Text +- 1˚C range"""
+    # fkth: value of building envelope thermal coefficient (kW/sq.m.-K)
+    # fath: value of building envelope area (sq. m.)
+    # ftint: internal temperature of building, set at 21˚C
+    # ftextavg: mean external temperature in a given hour
+    # fisunavg: mean solar irradiance in an hour (W/sq.m.)
+    # fqpavg: mean heat gains due to people in the given hour
+    # fqelavg: mean heat gains due to electrical appliances in the given hour
     fksunavg = (fath * (((fkth / 1000) * (ftint - ftextavg)) - (fqpavg / 1000)) - (fel * fqelavg)) / (
             fath * (fisunavg / 1000))
     return fksunavg
@@ -74,9 +68,9 @@ for building in range(len(B_Area)):
         qpavg = np.mean(Qpavg)
         qelavg = np.mean(Qelavg)
         iavg = np.mean(Iavg)
-        ksunleft = h(kthleft, B_Area[building], Tint, tavg, iavg, qpavg, qelavg)
-        ksunright = h(kthright, B_Area[building], Tint, tavg, iavg, qpavg, qelavg)
-        ksunmiddle = h(kthmiddle, B_Area[building], Tint, tavg, iavg, qpavg, qelavg)
+        ksunleft = calc_ksunavg(kthleft, B_Area[building], Tint, tavg, iavg, qpavg, qelavg)
+        ksunright = calc_ksunavg(kthright, B_Area[building], Tint, tavg, iavg, qpavg, qelavg)
+        ksunmiddle = calc_ksunavg(kthmiddle, B_Area[building], Tint, tavg, iavg, qpavg, qelavg)
 
         Qdemleft = list()
         Qdemright = list()
@@ -87,17 +81,17 @@ for building in range(len(B_Area)):
             i = i + 1
             # heating activated
             if T_Data[hour] < 16 and qel[0][hour] > 0:
-                qdemleft = g(kthleft, B_Area[building], Tint, T_Data[hour], ksunleft, i_Data[hour], qpeople[hour],
+                qdemleft = calc_qhour(kthleft, B_Area[building], Tint, T_Data[hour], ksunleft, i_Data[hour], qpeople[hour],
                              qel[building][hour])
                 if qdemleft > 0:
                     Qdemleft.append(qdemleft)
 
-                qdemright = g(kthright, B_Area[building], Tint, T_Data[hour], ksunright, i_Data[hour], qpeople[hour],
+                qdemright = calc_qhour(kthright, B_Area[building], Tint, T_Data[hour], ksunright, i_Data[hour], qpeople[hour],
                               qel[building][hour])
                 if qdemright > 0:
                     Qdemright.append(qdemright)
 
-                qdemmiddle = g(kthmiddle, B_Area[building], Tint, T_Data[hour], ksunmiddle, i_Data[hour], qpeople[hour],
+                qdemmiddle = calc_qhour(kthmiddle, B_Area[building], Tint, T_Data[hour], ksunmiddle, i_Data[hour], qpeople[hour],
                                qel[building][hour])
                 if qdemmiddle > 0:
                     Qdemmiddle.append(qdemmiddle)
@@ -135,13 +129,13 @@ for building in range(len(B_Area)):
         qpavg = np.mean(Qpavg)
         qelavg = np.mean(Qelavg)
         iavg = np.mean(Iavg)
-        ksun = h(kth, B_Area[building], Tint, tavg, iavg, qpavg, qelavg)
+        ksun = calc_ksunavg(kth, B_Area[building], Tint, tavg, iavg, qpavg, qelavg)
         Qdem = list()
         Qdemdash = list()
         for hour in range(len(T_Data)):
             # heating activated and office hours
             if T_Data[hour] < 16 and qel[0][hour] > 0:
-                qdem = g(kth, B_Area[building], Tint, T_Data[hour], ksun, i_Data[hour], qpeople[hour],
+                qdem = calc_qhour(kth, B_Area[building], Tint, T_Data[hour], ksun, i_Data[hour], qpeople[hour],
                          qel[building][hour])
                 # only heating needs to ba accounted for
                 if qdem > 0:
