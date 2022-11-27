@@ -4,6 +4,16 @@ Python libraries used:
 numpy
 pandas
 
+Supporting data files required to run the codes:
+Buildings.csv
+Occupancy.csv
+Weather.csv
+Please mae=ke sure these files are in the same folder as the python files.
+
+Python scripts:
+P1T1.py
+P1T123.py
+
 Two user-defined functions framed in P1T123.py:
 calc_qhour: Function to calculate the hourly heating demands of a building on EPFL Campus
 calc_ksunavg: Function to calculate average ksun values based on mean values of external conditions in Text +- 1˚C range
