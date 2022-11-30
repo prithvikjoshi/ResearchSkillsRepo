@@ -1,6 +1,9 @@
 from pandas import *
 import numpy as np
 
+# importing sys and os to point to the correct directory when the script finds .csv files
+import sys, os
+os.chdir(sys._MEIPASS)
 # ------------------------------------initializing given parameters and data--------------------------------------------
 
 # Electricity to heat factor, fel set at 80% by default from given data
