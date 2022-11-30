@@ -1,6 +1,9 @@
 # ResearchSkillsRepo
 
-The python files are in the root directory along with the data files (.csv). In order to enable the user to have a single click run, executable files have been prepared in the folders "For MACOS" and "For Windows" respectively. Upon clicking on "P1T123" executable in resp folders, the code runs on a terminal window and generates result in the file P1T123.csv.
+The easiest way to run the programme "P1T123.py" is to run an executable created for Mac OS (in folder "For MACOS") and for Windows (in folder "For Windows"). These can be found in path For Windows (or For MACOS) -> P1T123 -> P1T123.
+This will run the code sequence in terminal and generate the result file, P1T123.csv in the same path.
+
+If you wish to open the files in an editor, the root folder has these files along with the csv data files.
 
 Python libraries used:
 numpy
